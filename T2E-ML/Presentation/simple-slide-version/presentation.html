@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Presentation for T2E-Machine-Learning with Boosting</title>
+		<meta name="description" content="Slide for T2E-ML presentation">
+		<meta name="author" content="Yue Xiong">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/league.css" id="theme">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+		
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<a href="https://en.wikipedia.org/wiki/Survival_analysis">
+						<img src="/Users/echo/Documents/T2E-ML/Presentation/slides.js/survival-analysis-intro-icon.png" alt="Survival analysis representation icon" style="height: 180px; margin: 0 auto 4rem auto; background: transparent;" class="demo-logo">
+					</a>
+					<h3>Boosting in Cox Regression</h3>
+					<p>a comparison among the classical statistics-based, the likelihood-based and the model-based approaches</p>
+					<p>
+						<small>Created by <a style="color: cornflowerblue;">Yue Xiong | Data Science</a></small>
+					</p>
+				</section>
+
+				<section>
+					<h2 style="text-align: center;">Outline</h2>
+					<p>
+						<ul style="text-align: left;">
+							<li>Introduction to the <a style="color: cornflowerblue;">COX regression model</a></li>
+								<ul>
+									<li style="font-size: 30px;">Background (Survival Analysis)</li>
+									<li style="font-size: 30px;">The COX model</li>
+									<li style="font-size: 30px;">FGD Boosting</li>
+								</ul>
+							<li>Application with the three approaches</li>
+								<ul>
+									<li style="font-size: 30px;">Flexible boosting with the <u>AFT model</u></li>
+									<li style="font-size: 30px;"><u>mboost </u>: model-based boosting in the COX model</li>
+									<li style="font-size: 30px;"><u>CoxBoost </u>: offset-based boosting in the COX model</li>
+								</ul>
+							<li>Comparison</li>
+							<li>Allowing for <a style="color: cornflowerblue;">mandatory variables</a></li>
+							<li>Incorporating the <a style="color: cornflowerblue;">pathway information</a></li>
+							<li>Application with the <a style="color: cornflowerblue;">mlr3</a> learner</li>
+						  </ul>
+					</p>
+				</section>
+
+				<!-- Introduction to COX model -->
+				<section>
+					<section>
+						<h2>Introduction to the COX regression model (10min)</h2>
+		
+					</section>
+					<!-- nested vertical slides with Introduction to COX model page 1-->
+					<section data-auto-animate>
+						<ul>
+							<h3 style="text-align: left;">Background: Survival Analysis</h3>
+								<ul>
+									<br>
+									<h4><li>what is <a style="color: cornflowerblue;">survival analysis</a></li></h4>
+									<br>
+									<h4><li>The <a style="color: cornflowerblue;">COX model</a></li></h4>
+									<br>
+									<h4><li>FGD <a style="color:cornflowerblue;">Boosting</a></li></h4>
+								</ul>
+						</ul>
+					</section>
+
+					<!-- nested vertical slides with Introduction to COX model page 2-->
+					<section data-auto-animate>
+						<h3 style="text-align: left;">Background: Survival Analysis</h3>
+						<h4 style="text-align: left;">WHAT IS <a style="color: cornflowerblue;">SURVIVAL ANALYSIS</a></h4>
+						<ul>
+							<li>statistics for analyzing the expected duration of time until one or more events of interest happen</li>
+								<ul>
+									<li style="font-size: 30px;">e.g. death, failure in a mechanical system</li>
+								</ul>
+							<!-- <br> -->
+							<li>term</li>
+								<ul>
+									<li style="font-size: 30px;">event</li>
+									<li style="font-size: 30px;">time: $t$</li>
+									<li style="font-size: 30px;">censoring observation: $\delta$ (missing data)
+										<ul>
+											<li><u>right</u>-censoring</li>
+											<li><u>left</u>-censoring</li>
+										</ul>
+									</li>
+								</ul>
+								
+						</ul>
+					</section>
+
+					<!-- nested vertical slides with Introduction to COX model page 3-->
+					<section data-auto-animate>
+						<h3 style="text-align: left;">Background: Survival Analysis</h3>
+						<h4 style="text-align: left;">The <a style="color: cornflowerblue;">COX model</a></h4>
+						<ul>
+							<li><u>intuition</u>: for quantitive predictor variables, we use the COX PH hazard regression model</li>
+							<!-- <br> -->
+							<li><u>hazard  function</u> $\lambda$</li>
+								<ul>
+									<li style="font-size: 30px;">def: event rate at time $t$ conditional or survival until time $t$ or later</li>
+									<li style="font-size: 30px;">consider the time-to-event data $(t, x, \delta)$
+										<ul>
+											<li>the hazard function $\lambda(t|X) = \lambda_{0}(t) exp(X^{T}\beta) = \lambda_{0}(t) exp(\beta_{1}X_{i1} + ... + \beta_{p}X_{ip})$</li>
+												<!-- <div style="font-size: 30px;"></div> -->
+											
+										</ul>
+									</li>
+								</ul>
+							<li><u>estimator</u> for $\beta$</li>
+								<ul>
+									<li style="font-size: 30px;">by maximizing the partial log-likelihood ($MPLE$)</li>
+									<li style="font-size: 30px;">$pl(\beta)=\sum_{i=1}^{n} \delta_{i}(X_{i}^{T})\beta -log(\sum_{l \in R_{i}}exp\left\{(X_{l}^{T}\beta)\right\}$</li>
+								</ul>
+								
+						</ul>
+					</section>
+
+					<!-- nested vertical slides with Introduction to COX model page 4-->
+					<section data-auto-animate>
+						<h3 style="text-align: left;">Background: Survival Analysis</h3>
+						<h4 style="text-align: left;">FGD <a style="color: cornflowerblue;">Boosting</a></h4>
+						<ul>
+							<li><u>intuition</u>: at each iteration, a weak learner is fitted on the modified version of data with the goal of minimizing the empirical loss function</li>
+							<!-- <br> -->
+							<li><u>motivation</u>: we will use boosting techniques when</li>
+								<ul>
+									<li style="font-size: 30px;">the number of covariates is large or</li>
+									<li style="font-size: 30px;">it is hard to directly derive the partial log-likelihood</li>
+								</ul>
+								
+						</ul>
+					</section>
+
+					<!-- nested vertical slides with Introduction to COX model page 5-->
+					<section data-auto-animate>
+						<h3 style="text-align: left;">Background: Survival Analysis</h3>
+						<h4 style="text-align: left;">FGD <a style="color: cornflowerblue;">Boosting</a></h4>
+						
+						<div style="text-align: left;"><u>semi-parametric</u> boosting</div>
+						<br>
+						<ul>
+							<li style="font-size: 30px;">given: $L(y,F(X))$ is a generic loss function and $F(x)$ is a statistical model.</li>
+							<br>
+							<li style="font-size: 30px;">goal: to estimate $F(X)$ by iteratively updating its value through a base learner $h(y,X)$</li>
+							<!-- <li style="font-size: 30px;">algorithm
+								<ol>
+									<li>initialize the estimate, e.g., $\hat{F}(X) = constant$;</li>
+									<li>compute the pseudo-residual vector, $u = - \frac{\partial L(y,F(X))}{\partial F(X)}$, where $F(X) = \hat{F}(X)$;</li>
+									<li>compute the update by:
+										<ol>
+											<li>fit the base learner to the pseudo-residual vector, $\hat{h}(u,X)$;</li>
+											<li>penalize the value, $\hat{f}(X)=v \hat{h}(u,X)$;</li>
+										</ol>
+									</li>
+									<li>update the estimate, $\hat{F}(X) = \hat{F}(X) + \hat{f}(X)$</li>
+								</ol>
+							</li> -->
+						</ul>
+					</section>
+
+					<!-- nested vertical slides with Introduction to COX model page 6-->
+					<section data-auto-animate>
+						<h3 style="text-align: left;">Background: Survival Analysis</h3>
+						<h4 style="text-align: left;">FGD <a style="color: cornflowerblue;">Boosting</a></h4>
+						
+						<div style="text-align: left;"><u>semi-parametric</u> boosting</div>
+						<ul>
+							<!-- <li style="font-size: 30px;">given</li>
+							<li style="font-size: 30px;">goal</li> -->
+							<li style="font-size: 30px;" ><b style="color: cornflowerblue;">algorithm</b>
+								<ol>
+									<li>initialize the estimate, e.g., $\hat{F}(X) = constant$;</li>
+									<li>compute the pseudo-residual vector, $u = - \frac{\partial L(y,F(X))}{\partial F(X)}$, where $F(X) = \hat{F}(X)$;</li>
+									<li>compute the update by:
+										<ol>
+											<li>fit the base learner to the pseudo-residual vector, $\hat{h}(u,X)$;</li>
+											<li>penalize the value, $\hat{f}(X)=v \hat{h}(u,X)$;</li>
+										</ol>
+									</li>
+									<li>update the estimate, $\hat{F}(X) = \hat{F}(X) + \hat{f}(X)$</li>
+								</ol>
+							</li>
+						</ul>
+					</section>
+					
+					<!-- nested vertical slides with Introduction to COX model page 7-->
+					<section data-auto-animate>
+						<h3 style="text-align: left;">Background: Survival Analysis</h3>
+						<h4 style="text-align: left;">FGD <a style="color: cornflowerblue;">Boosting</a></h4>
+						
+						<div style="text-align: left;"><u>parametric</u> boosting</div>
+						<br>
+						<ul>
+							<li style="font-size: 30px;">given: $F(X)$ is a parameterized class of functions, $F(X, \beta)$.</li>
+							<br>
+							<li style="font-size: 30px;">the update process involves the estimate of the parameter, i.e. the regression coefficient $\beta$</li>
+							<!-- <li style="font-size: 30px;">algorithm
+								<ol>
+									<li>initialize the estimate, e.g., $\hat{F}(X) = constant$;</li>
+									<li>compute the pseudo-residual vector, $u = - \frac{\partial L(y,F(X))}{\partial F(X)}$, where $F(X) = \hat{F}(X)$;</li>
+									<li>compute the update by:
+										<ol>
+											<li>fit the base learner to the pseudo-residual vector, $\hat{h}(u,X)$;</li>
+											<li>penalize the value, $\hat{f}(X)=v \hat{h}(u,X)$;</li>
+										</ol>
+									</li>
+									<li>update the estimate, $\hat{F}(X) = \hat{F}(X) + \hat{f}(X)$</li>
+								</ol>
+							</li> -->
+						</ul>
+					</section>
+
+					<!-- nested vertical slides with Introduction to COX model page 8-->
+					<section data-auto-animate>
+						<h3 style="text-align: left;">Background: Survival Analysis</h3>
+						<h4 style="text-align: left;">FGD <a style="color: cornflowerblue;">Boosting</a></h4>
+						
+						<div style="text-align: left;"><u>parametric</u> boosting</div>
+						<ul>
+							<li style="font-size: 30px;" ><b style="color: cornflowerblue;">algorithm</b>
+								<ol>
+									<li>initialize the estimate, e.g., $\hat{\beta} = (0,...,0)$;</li>
+									<li>compute the pseudo-residual vector, $u = - \frac{\partial L(y,F(X,\beta))}{\partial F(X,\beta)}$, where $\beta = \hat{\beta}$;</li>
+									<li>compute the possible updates by:
+										<ol>
+											<li>fit the base learner to the pseudo-residual vector, $\hat{h}(u,X_{j})$;</li>
+											<li>penalize the value, $\hat{b}_{j}=v \hat{h}(u,X_{j})$;</li>
+										</ol>
+									</li>
+									<li>select the best update $j^{*}$</li>
+									<li>update the estimate, $\hat{\beta}_{j^{*}} = \hat{\beta}_{j^{*}} + \hat{b}_{j}$</li>
+								</ol>
+							</li>
+						</ul>
+					</section>
+
+					<!-- nested vertical slides with Introduction to COX model page 9-->
+					<section data-auto-animate>
+						<h3 style="text-align: left;">Background: Survival Analysis</h3>
+						<h4 style="text-align: left;">FGD <a style="color: cornflowerblue;">Boosting</a></h4>
+						
+						<div style="text-align: left;">boosting with the <u>regularized</u> empirical risk function</div>
+						
+						<br>
+						<ul>
+							<li style="text-align: left; font-size: 30px;">penalize over the empirical risk function by adding $\lambda \cdot J(f)$ </li>
+								<ul>
+									<li style="font-size: 30px;">the complexity control parameter $\lambda$</li>
+									<li style="font-size: 30px;">the complexity penalty $J(f)$</li>
+								</ul>
+							<li style="text-align: left; font-size: 30px;"><b style="color: cornflowerblue;">algorithm</b></li>
+								<br>
+								<ul>
+									??
+								</ul>
+							</li>
+							<br>
+						</ul>
+						
+					</section>
+
+				</section>
+
+				
+				<!-- Applications -->
+				<section>
+					<section>
+						<h2>Applications with the three approaches (6min)</h2>
+					</section>
+
+					<!-- FGD with the AFT model -->
+					<!-- nested vertical slides with Applications page 1-->
+					<section id="fragments">
+						<h3 style="text-align: left;">Flexible boosting with the AFT model</h3>
+						<h4 class="fragment" style="text-align: left;">objective: to fit the <span style="color: cornflowerblue;">accelarated failure time model</span></h4>
+						<p class="fragment" style="font-size: 30px;">
+							
+								$log(T)=f(X)+\sigma \cdot w$
+							
+						</p>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">1. $f$ is an unknown <u>predictor function</u> of $log(T)$, </span> <span class="fragment">e.g. linear or additive function of covariates $X$;</span>
+						</p>
+
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">2. $\sigma$ is an unknown <u>scale parameter </u></span> <span class="fragment">which controls the amount of noise added to $f$;</span>
+						</p>
+
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">3. $w$ is a <u>noise variable</u></span> <span class="fragment">whose distribution function determines the distribution form of survival time $T$.</span>
+							<br>
+							<span style="display: inline-block; font-size: 25px;" class="fragment fade-up"> * If fully specified, we refer to it as a <u>parametric</u> AFT model. </span>
+							<br>
+							<span style="display: inline-block; font-size: 25px;" class="fragment fade-up"> * Otherwise, it is named a <u>semi-parametric</u> AFT model</span>
+
+						</p>
+					</section>
+					<!-- nested vertical slides with Applications page 2-->
+					<section id="fragments">
+						<h3 style="text-align: left;">Flexible boosting with the AFT model</h3>
+						<h4 class="fragment" style="text-align: left;">FGD boosting with the <span style="color: cornflowerblue;">semi-parametric</span> AFT model</h4>
+						<p class="fragment" style="font-size: 40px; text-align: left;">
+							
+							Similarly,							
+						</p>
+						<p style="font-size: 30px; text-align: left;">
+							<span style="display: inline-block;" class="fragment fade-up">1. Initialize with $f$</span>
+						</p>
+						<p style="font-size: 30px; text-align: left;">
+							<span style="display: inline-block;" class="fragment fade-up">2. Compute the negative gradient vector <u>predictor function</u> of $log(T)$;</span>
+						</p>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">3. Fit the negative gradient vector to each covariate of $X$ seperately by $p$ times</span> <span class="fragment"> using a simple linear regression estimator;</span>
+						</p>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">4. Select the best-fitted component of $X$, </span> <span class="fragment"> according to a pre-specified goodness of fit criterion;</span>
+						</p>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">5. Update with the real-valued step length factor $v$<span class="fragment"> and iterate $m_{stop}$ times.</span>
+						</p>
+						
+					</section>
+					<!-- nested vertical slides with Applications page 3-->
+					<section id="fragments">
+						<h3 style="text-align: left;">Flexible boosting with the AFT model</h3>
+						<h4 class="fragment" style="text-align: left;">FGD boosting with the <span style="color: cornflowerblue;">parametric</span> AFT model</h4>
+						<p class="fragment" style="font-size: 30px; text-align: center;">
+							
+							Apart from $f$, we are also estimating for the <span class="fragment highlight-red">scale parameter</span> $\sigma$						
+						</p>
+						
+					</section>
+
+					<!-- mboost for COX regression -->
+					<!-- nested vertical slides with Applications page 4-->
+					<section id="fragments">
+						<h3 style="text-align: left;">mboost for COX regression</h3>
+						<p class="fragment" style="text-align: left; font-size: 40px;">model-based approach where the<span style="color: cornflowerblue;"> loss function $L(\cdot)$</span> can be specified</p>
+						<p class="fragment" style="text-align: left; font-size: 40px;">suppose we are using the <span style="color: cornflowerblue;">L2-loss</span> function, <span class="fragment">then the estimator for $\beta$ is $(X^{T}X)^{-1}X^{T}u$</span></p>
+						<p class="fragment" style="text-align: left; font-size: 40px;">e.g. $glmboost$</p>
+						<p class="fragment" style="text-align: left; font-size: 40px;">algorithm<span class="fragment"> ( <u>initialize</u>,</span> <span class="fragment"> <u>compute and fit</u>,</span> <span class="fragment"> <u>select the best update</u>,</span> <span class="fragment"> <u>update</u> the estimate )</span></p>
+					</section>
+
+					<!-- CoxBoost for COX regression -->
+					<!-- nested vertical slides with Applications page 5-->
+					<section id="fragments">
+						<h3 style="text-align: left;">CoxBoost for COX regression</h3>
+						<p class="fragment" style="text-align: left; font-size: 40px;"><span style="color: cornflowerblue;">offset-based</span> approach and derive the penalized MPLE</p>
+						<p class="fragment" style="text-align: left; font-size: 40px;">in each boosting step, the previous step are incorporated as an<span style="color: cornflowerblue;"> offset</span> in<u> <span class="fragment highlight-red">penalized</span> log-likelihood estimation</u></p>
+						<p class="fragment" style="text-align: left; font-size: 40px;">e.g. add the <u>L2-penalty</u></p>
+						<p class="fragment" style="text-align: center; font-size: 30px;">$pl_{pen}(\beta)=pl(\beta)+\lambda \left \| \beta \right \|_{2}^{2}=pl(\beta)-0.5\lambda \beta^{T}P\beta$</p>
+						<p class="fragment" style="text-align: left; font-size: 30px;">an offset term $\hat{\eta}=X^{T} \hat{\beta}$ is added to the above log-likelihood to save the iterative updates of the parameter estimate</p>
+
+						<p class="fragment" style="text-align: left; font-size: 30px;">algorithm<span class="fragment"> ( <u>initialize</u>,</span> <span class="fragment"> <u>compute updates with the penalized MPLE and fit</u>,</span> <span class="fragment"> <u>select the best update</u>,</span>  <span class="fragment"> <u>update</u> the estimate )</span></p>
+					</section>
+
+				</section>
+
+				<!-- Comparison -->
+				<section>
+					<section>
+						<h2>Comparison (5min)</h2>
+					</section>
+
+					<!-- characteristics -->
+					<!-- nested vertical slides with Comparison page 1-->
+					<section id="fragments">
+						<h4 style="text-align: left;">Flexible boosting with the <span style="color: cornflowerblue;">AFT model</span></h4>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">1. $\sigma$ and $w$</span>
+							</p>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">2. semi-parametric and parametric</span>
+							</p>
+
+						<h4 style="text-align: left;"><span style="color: cornflowerblue;">mboost</span></h4>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">1. user-defined loss function</span>
+							</p>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">2. MPLE</span>
+							</p>
+						
+						<h4 style="text-align: left;"><span style="color: cornflowerblue;">CoxBoost</span></h4>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">1. user-defined loss function</span>
+							</p>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">2. restricted MPLE</span>
+							</p>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">3. flexible penalty structure</span> <span class="fragment"> ( <u>variable selection</u>, </span> <span class="fragment"> <u>mandatory variables</u>,</span> <span class="fragment"> <u>correlated covariates</u> )</span>
+							</p>
+
+					</section>
+
+					<!-- Remark1-->
+					<!-- nested vertical slides with Comparison page 2-->
+					<section id="fragments">
+						<h4 style="text-align: left;"><span style="color: cornflowerblue;">remark 1</span></h4>
+						<p style="text-align: left; font-size: 40px;"><span class="fragment">The three approaches are <span class="fragment highlight-red">identical</span> when</span></p>
+							<p style="font-size: 35px; text-align: left;">
+								<span class="fragment">* $f$ is set to be a linear regression model</span>
+							</p>
+							<p style="font-size: 35px; text-align: left;">
+								<span class="fragment">* $L(\cdot)$ is defined as the same loss function (e.g. L2-Loss)</span>
+							</p>
+							<p style="font-size: 35px; text-align: left;">
+								<span class="fragment">* As for the AFT model: $w$ is not specified</span>
+							</p>
+							<p style="font-size: 35px; text-align: left;">
+								<span class="fragment">* As for the CoxBoost: $\lambda$ is set to zero (no penalty is added)</span>
+							</p>
+					</section>
+
+					<!-- Remark2 -->
+					<!-- nested vertical slides with Comparison page 3-->
+					<section id="fragments">
+							<h4 style="text-align: left;"><span style="color: cornflowerblue;">remark 2 (not sure)</span></h4>
+								<p style="text-align: left; font-size: 40px;"><span class="fragment">The previous remark is also <span class="fragment highlight-red">true</span> for suitable values of $v$ and $\lambda$</span></p>
+								<p style="font-size: 35px; text-align: left;">
+									<span class="fragment">with standardized $X$</span>
+								</p>
+								<p style="font-size: 35px; text-align: center;">
+									<span class="fragment">* $\lambda = n(1-v)/v$</span>
+								</p>
+								<p style="font-size: 35px; text-align: left;">
+									<span class="fragment">or</span>
+								</p>
+								<p style="font-size: 35px; text-align: center;">
+									<span class="fragment">* $\lambda = \frac{X_{j}^{T} X_{j} + vpl_{\beta_{j}}(0|\hat{\beta})}{v}$</span>
+								</p>
+					</section>
+
+					<!-- Remark3 -->
+					<!-- nested vertical slides with Comparison page 3-->
+					<section id="fragments">
+						<h4 style="text-align: left;"><span style="color: cornflowerblue;">remark 3</span></h4>
+							<p style="text-align: left; font-size: 40px;"><span class="fragment">The <u>learning path</u> of the three different approach-based boosting procedures may<span class="fragment highlight-red"> differ</span> due to different choice of which dimension should be updated at each boosting step</span></p>
+							<p style="font-size: 35px; text-align: left;">
+								<span class="fragment"><em>in the AFT model</em></span>
+							</p>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">* extra paticipation of $\sigma$</span>
+							</p>
+							<p style="font-size: 35px; text-align: left;">
+								<span class="fragment"><em>in $glmboost$</em></span>
+							</p>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">* the choice is based on the residuals of the regression of $u$ on $X_{j}$</span>
+							</p>
+							<p style="font-size: 35px; text-align: left;">
+								<span class="fragment"><em>in $CoxBoost$</em></span>
+							</p>
+							<p style="font-size: 30px; text-align: left;">
+								<span class="fragment">* dimension is selected with the largest decrease of the penalized partial log-likelihood function</span>
+							</p>
+				</section>
+
+			
+			</section>
+
+			<!-- Allowing for mandatory variables -->
+			<section>
+				<section>
+					<h2>Allowing for mandatory variables (3min)</h2>
+				</section>
+
+				<!-- characteristics -->
+				<!-- nested vertical slides with Allowing for mandatory variables page 1-->
+				<section id="fragments">
+					<h3 style="text-align: left;" class="fragment">what is<span style="color: cornflowerblue;"> mandatory variables</span>?</h3>
+					
+
+					<h4 style="text-align: left;" class="fragment">Favoring strategy in the<em> AFT model</em></h4>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">* LASSO regression approach</span>
+						</p>
+					
+					<h4 style="text-align: left;" class="fragment">Favoring strategy in <em> $glmboost$</em></h4>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">* The covariates are divided into the mandatory and the non-mandatory groups </span>
+						</p>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">* the penalization with $v$ is applied only to the non-mandatory components</span>
+						</p>
+					
+					<h4 style="text-align: left;" class="fragment">Favoring strategy in <em> $CoxBoost$</em></h4>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">1. configure the penalty matrix $P$</span>
+						</p>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">2. mandatory variables can be introduced by updating their parameters before each step of componentwise $CoxBoost$</span>
+						</p>
+
+				</section>
+			</section>
+
+			<!-- Incorporating pathway info -->
+			<section>
+				<section>
+					<h2>Incorporating pathway information (1min)</h2>
+				</section>
+
+				<!-- characteristics -->
+				<!-- nested vertical slides with Incorporating pathway info page 1-->
+				<section id="fragments">
+					<h4 style="text-align: left;" class="fragment">what is<span style="color: cornflowerblue;"> pathway information</span>?</h4>
+					<p style="font-size: 30px; text-align: left;">
+						<span class="fragment">* <span style="color: red;">correlated</span> microarray features</span>
+					</p>
+					<p style="font-size: 30px; text-align: left;">
+						<span class="fragment">* <span style="color: red;">trade-off</span> between model complexity and the representation power</span>
+					</p>
+
+					<h4 style="text-align: left;" class="fragment">Objective: <span style="color: cornflowerblue;">discouraging</span> the selection of <span style="color: cornflowerblue;">single</span> microarray features</h4>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">1. increasing the penalty for a selected covariate</span>
+						</p>
+
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">2. decreasing the penalty for connected covariates</span>
+						</p>
+
+				</section>
+			</section>
+
+			<section>
+				<h2>Application with the mlr3 learner</h2>
+				$a^2$
+			</section>
+
+
+			</div>
+
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/zoom/zoom.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/search/search.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<!-- load the math equation support by math3.js and  -->
+		<script src="plugin/math/math.js"></script>
+		
+		<script>
+
+			// Also available as an ES module, see:
+			// https://revealjs.com/initialization/
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				center: true,
+				hash: true,
+				slideNumber: true,
+				// history: true,
+				// transition: 'linear',
+				math: {
+					mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+					TeX: {
+						Macros: {
+							R: '\\mathbb{R}',
+							set: [ '\\left\\{#1 \\; ; \\; #2\\right\\}', 2 ]
+						}
+					}
+				},
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight, RevealMath ]
+			});
+
+		</script>
+
+	</body>
+</html>
