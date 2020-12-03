@@ -39,28 +39,33 @@
 					</p>
 				</section>
 
+				<!-- outline -->
 				<section>
-					<h2 style="text-align: center;">Outline</h2>
-					<p>
-						<ul style="text-align: left;">
-							<li>Introduction to the <a style="color: cornflowerblue;">COX regression model</a></li>
-								<ul>
-									<li style="font-size: 30px;">Background (Survival Analysis)</li>
-									<li style="font-size: 30px;">The COX model</li>
-									<li style="font-size: 30px;">FGD Boosting</li>
-								</ul>
-							<li>Application with the three approaches</li>
-								<ul>
-									<li style="font-size: 30px;">Flexible boosting with the <u>AFT model</u></li>
-									<li style="font-size: 30px;"><u>mboost </u>: model-based boosting in the COX model</li>
-									<li style="font-size: 30px;"><u>CoxBoost </u>: offset-based boosting in the COX model</li>
-								</ul>
-							<li>Comparison</li>
-							<li>Allowing for <a style="color: cornflowerblue;">mandatory variables</a></li>
-							<li>Incorporating the <a style="color: cornflowerblue;">pathway information</a></li>
-							<li>Application with the <a style="color: cornflowerblue;">mlr3</a> learner</li>
-						  </ul>
-					</p>
+					<section>
+						<h2 style="text-align: center;">Outline</h2>
+					</section>
+					<section data-auto-animate>
+						<p>
+							<ul style="text-align: left;">
+								<h5>Introduction to the <a style="color: cornflowerblue;">COX regression model</a></h5>
+									<ul>
+										<li style="font-size: 30px;">Background (Survival Analysis)</li>
+										<li style="font-size: 30px;">The COX model</li>
+										<li style="font-size: 30px;">FGD Boosting</li>
+									</ul>
+								<h5>Algorithms of the three approaches</h5>
+									<ul>
+										<li style="font-size: 30px;">Flexible boosting with the <u>AFT model</u></li>
+										<li style="font-size: 30px;"><u>mboost </u>: model-based boosting in the COX model</li>
+										<li style="font-size: 30px;"><u>CoxBoost </u>: offset-based boosting in the COX model</li>
+									</ul>
+								<h5>Comparison</h5>
+								<h5>Allowing for <a style="color: cornflowerblue;">mandatory variables</a></h5>
+								<h5>Incorporating the <a style="color: cornflowerblue;">pathway information</a></h5>
+								<h5>Application with the <a style="color: cornflowerblue;">mlr3</a> learner</h5>
+							</ul>
+						</p>
+					</section>
 				</section>
 
 				<!-- Introduction to COX model -->
@@ -264,17 +269,23 @@
 						
 						<br>
 						<ul>
-							<li style="text-align: left; font-size: 30px;">penalize over the empirical risk function by adding $\lambda \cdot J(f)$ </li>
+							<li style="text-align: left; font-size: 30px;"><b style="color: cornflowerblue;">trade-off</b></li>
+							<li style="text-align: left; font-size: 30px;"><b style="color: cornflowerblue;">application</b></li>
+							<li style="text-align: left; font-size: 30px;"><b style="color: cornflowerblue;">methods</b></li>
 								<ul>
-									<li style="font-size: 30px;">the complexity control parameter $\lambda$</li>
-									<li style="font-size: 30px;">the complexity penalty $J(f)$</li>
+									<li style="font-size: 30px;">$v$</li>
+										<ul>
+											<li style="font-size: 30px;">penalize over the boosting <u>computing updates</u> step before the next iteration</li>
+											<li style="font-size: 30px;">$\hat{F} = \hat{F} + v \cdot \hat{h}$</li>
+										</ul>
+									<li style="font-size: 30px;">$\lambda$</li>
+										<ul>
+											<li style="font-size: 30px;">penalize over the <u>empirical risk function</u> by adding $\lambda \cdot P(f)$</li>
+											<li style="font-size: 30px;">the complexity control parameter $\lambda$</li>
+											<li style="font-size: 30px;">the complexity penalty matrix $P(f)$</li>
+										</ul>
 								</ul>
-							<li style="text-align: left; font-size: 30px;"><b style="color: cornflowerblue;">algorithm</b></li>
-								<br>
-								<ul>
-									??
-								</ul>
-							</li>
+							
 							<br>
 						</ul>
 						
@@ -283,14 +294,14 @@
 				</section>
 
 				
-				<!-- Applications -->
+				<!-- Algorithms -->
 				<section>
 					<section>
-						<h2>Applications with the three approaches (6min)</h2>
+						<h2>Algorithms of the three approaches (6min)</h2>
 					</section>
 
 					<!-- FGD with the AFT model -->
-					<!-- nested vertical slides with Applications page 1-->
+					<!-- nested vertical slides with Algorithms page 1-->
 					<section id="fragments">
 						<h3 style="text-align: left;">Flexible boosting with the AFT model</h3>
 						<h4 class="fragment" style="text-align: left;">objective: to fit the <span style="color: cornflowerblue;">accelarated failure time model</span></h4>
@@ -356,23 +367,25 @@
 					<!-- nested vertical slides with Applications page 4-->
 					<section id="fragments">
 						<h3 style="text-align: left;">mboost for COX regression</h3>
-						<p class="fragment" style="text-align: left; font-size: 40px;">model-based approach where the<span style="color: cornflowerblue;"> loss function $L(\cdot)$</span> can be specified</p>
-						<p class="fragment" style="text-align: left; font-size: 40px;">suppose we are using the <span style="color: cornflowerblue;">L2-loss</span> function, <span class="fragment">then the estimator for $\beta$ is $(X^{T}X)^{-1}X^{T}u$</span></p>
-						<p class="fragment" style="text-align: left; font-size: 40px;">e.g. $glmboost$</p>
-						<p class="fragment" style="text-align: left; font-size: 40px;">algorithm<span class="fragment"> ( <u>initialize</u>,</span> <span class="fragment"> <u>compute and fit</u>,</span> <span class="fragment"> <u>select the best update</u>,</span> <span class="fragment"> <u>update</u> the estimate )</span></p>
+						<p class="fragment" style="text-align: left; font-size: 40px;">always fit the pseudo-residual vector with the<span style="color: cornflowerblue;"> least square estimator</span> <span class="fragment highlight-red">$(X^{T}X)^{-1}X^{T}u$</span></p>
+						<p class="fragment" style="text-align: left; font-size: 40px;">* we can also compute the pseudo-residual vector $u$ with <span style="color: cornflowerblue;"></span>penalized MPLE</span> <span class="fragment highlight-red"> using $\lambda$ to penalize</span></p>
+						<p class="fragment" style="text-align: left; font-size: 40px;">select the best update via user defined loss functions, e.g. <u>COX-PH loss function</u>, <span class="fragment highlight-red">c-index</span></p>
+
+						<p class="fragment" style="text-align: left; font-size: 40px;"><span style="color: cornflowerblue;">algorithm</span><span class="fragment"> ( <u>initialize</u>,</span> <span class="fragment"> <u>compute and fit</u>,</span> <span class="fragment"> <u>select the best update</u>,</span> <span class="fragment"> <u>update</u> the estimate )</span></p>
 					</section>
 
 					<!-- CoxBoost for COX regression -->
 					<!-- nested vertical slides with Applications page 5-->
 					<section id="fragments">
 						<h3 style="text-align: left;">CoxBoost for COX regression</h3>
-						<p class="fragment" style="text-align: left; font-size: 40px;"><span style="color: cornflowerblue;">offset-based</span> approach and derive the penalized MPLE</p>
-						<p class="fragment" style="text-align: left; font-size: 40px;">in each boosting step, the previous step are incorporated as an<span style="color: cornflowerblue;"> offset</span> in<u> <span class="fragment highlight-red">penalized</span> log-likelihood estimation</u></p>
-						<p class="fragment" style="text-align: left; font-size: 40px;">e.g. add the <u>L2-penalty</u></p>
-						<p class="fragment" style="text-align: center; font-size: 30px;">$pl_{pen}(\beta)=pl(\beta)+\lambda \left \| \beta \right \|_{2}^{2}=pl(\beta)-0.5\lambda \beta^{T}P\beta$</p>
-						<p class="fragment" style="text-align: left; font-size: 30px;">an offset term $\hat{\eta}=X^{T} \hat{\beta}$ is added to the above log-likelihood to save the iterative updates of the parameter estimate</p>
+						<p class="fragment" style="text-align: left; font-size: 30px;"><span style="color: cornflowerblue;">offset-based</span> approach and derive the penalized MPLE</p>
+						<p class="fragment" style="text-align: left; font-size: 30px;">in each boosting step, the previous step are incorporated as an<span style="color: cornflowerblue;"> offset</span> in<u> <span class="fragment highlight-red">penalized</span> log-likelihood estimation</u></p>
+						<p class="fragment" style="text-align: left; font-size: 30px;">e.g. add the <u>L2-penalty</u></p>
+						<p class="fragment" style="text-align: center; font-size: 25px;">$pl_{pen}(\beta)=pl(\beta)+\lambda \left \| \beta \right \|_{2}^{2}=pl(\beta)-0.5\lambda \beta^{T}P\beta$</p>
+						<p class="fragment" style="text-align: left; font-size: 25px;">compute possible updates via <span class="fragment highlight-red">Newton-Raphson</span> method</p>
+						<p class="fragment" style="text-align: left; font-size: 25px;">select the best update with the<span class="fragment highlight-red"> first order Taylor Approximation</span> around 0</p>
 
-						<p class="fragment" style="text-align: left; font-size: 30px;">algorithm<span class="fragment"> ( <u>initialize</u>,</span> <span class="fragment"> <u>compute updates with the penalized MPLE and fit</u>,</span> <span class="fragment"> <u>select the best update</u>,</span>  <span class="fragment"> <u>update</u> the estimate )</span></p>
+						<p class="fragment" style="text-align: left; font-size: 25px;">algorithm<span class="fragment"> ( <u>initialize</u>,</span> <span class="fragment"> <u>compute updates with the penalized MPLE and fit</u>,</span> <span class="fragment"> <u>select the best update</u>,</span>  <span class="fragment"> <u>update</u> the estimate )</span></p>
 					</section>
 
 				</section>
@@ -380,7 +393,7 @@
 				<!-- Comparison -->
 				<section>
 					<section>
-						<h2>Comparison (5min)</h2>
+						<h2>Comparison (3min)</h2>
 					</section>
 
 					<!-- characteristics -->
@@ -396,67 +409,30 @@
 
 						<h4 style="text-align: left;"><span style="color: cornflowerblue;">mboost</span></h4>
 							<p style="font-size: 30px; text-align: left;">
-								<span class="fragment">1. user-defined loss function</span>
+								<span class="fragment">1. least square estimator</span>
 							</p>
 							<p style="font-size: 30px; text-align: left;">
-								<span class="fragment">2. MPLE</span>
+								<span class="fragment">2. penalize with $v$ ( also $\lambda$ )</span>
 							</p>
 						
 						<h4 style="text-align: left;"><span style="color: cornflowerblue;">CoxBoost</span></h4>
 							<p style="font-size: 30px; text-align: left;">
-								<span class="fragment">1. user-defined loss function</span>
+								<span class="fragment">1. restricted MPLE</span>
 							</p>
 							<p style="font-size: 30px; text-align: left;">
-								<span class="fragment">2. restricted MPLE</span>
+								<span class="fragment">2. Newton-Raphson method</span>
 							</p>
 							<p style="font-size: 30px; text-align: left;">
-								<span class="fragment">3. flexible penalty structure</span> <span class="fragment"> ( <u>variable selection</u>, </span> <span class="fragment"> <u>mandatory variables</u>,</span> <span class="fragment"> <u>correlated covariates</u> )</span>
+								<span class="fragment">3. flexible penalty structure with $\lambda$ and $P$</span> <span class="fragment"> ( <u>variable selection</u>, </span> <span class="fragment"> <u>mandatory variables</u>,</span> <span class="fragment"> <u>correlated covariates</u> )</span>
 							</p>
 
 					</section>
 
-					<!-- Remark1-->
-					<!-- nested vertical slides with Comparison page 2-->
-					<section id="fragments">
-						<h4 style="text-align: left;"><span style="color: cornflowerblue;">remark 1</span></h4>
-						<p style="text-align: left; font-size: 40px;"><span class="fragment">The three approaches are <span class="fragment highlight-red">identical</span> when</span></p>
-							<p style="font-size: 35px; text-align: left;">
-								<span class="fragment">* $f$ is set to be a linear regression model</span>
-							</p>
-							<p style="font-size: 35px; text-align: left;">
-								<span class="fragment">* $L(\cdot)$ is defined as the same loss function (e.g. L2-Loss)</span>
-							</p>
-							<p style="font-size: 35px; text-align: left;">
-								<span class="fragment">* As for the AFT model: $w$ is not specified</span>
-							</p>
-							<p style="font-size: 35px; text-align: left;">
-								<span class="fragment">* As for the CoxBoost: $\lambda$ is set to zero (no penalty is added)</span>
-							</p>
-					</section>
-
-					<!-- Remark2 -->
-					<!-- nested vertical slides with Comparison page 3-->
-					<section id="fragments">
-							<h4 style="text-align: left;"><span style="color: cornflowerblue;">remark 2 (not sure)</span></h4>
-								<p style="text-align: left; font-size: 40px;"><span class="fragment">The previous remark is also <span class="fragment highlight-red">true</span> for suitable values of $v$ and $\lambda$</span></p>
-								<p style="font-size: 35px; text-align: left;">
-									<span class="fragment">with standardized $X$</span>
-								</p>
-								<p style="font-size: 35px; text-align: center;">
-									<span class="fragment">* $\lambda = n(1-v)/v$</span>
-								</p>
-								<p style="font-size: 35px; text-align: left;">
-									<span class="fragment">or</span>
-								</p>
-								<p style="font-size: 35px; text-align: center;">
-									<span class="fragment">* $\lambda = \frac{X_{j}^{T} X_{j} + vpl_{\beta_{j}}(0|\hat{\beta})}{v}$</span>
-								</p>
-					</section>
 
 					<!-- Remark3 -->
 					<!-- nested vertical slides with Comparison page 3-->
 					<section id="fragments">
-						<h4 style="text-align: left;"><span style="color: cornflowerblue;">remark 3</span></h4>
+						<h4 style="text-align: left;"><span style="color: cornflowerblue;">remark</span></h4>
 							<p style="text-align: left; font-size: 40px;"><span class="fragment">The <u>learning path</u> of the three different approach-based boosting procedures may<span class="fragment highlight-red"> differ</span> due to different choice of which dimension should be updated at each boosting step</span></p>
 							<p style="font-size: 35px; text-align: left;">
 								<span class="fragment"><em>in the AFT model</em></span>
@@ -465,7 +441,7 @@
 								<span class="fragment">* extra paticipation of $\sigma$</span>
 							</p>
 							<p style="font-size: 35px; text-align: left;">
-								<span class="fragment"><em>in $glmboost$</em></span>
+								<span class="fragment"><em>in $mboost$</em></span>
 							</p>
 							<p style="font-size: 30px; text-align: left;">
 								<span class="fragment">* the choice is based on the residuals of the regression of $u$ on $X_{j}$</span>
@@ -490,23 +466,22 @@
 				<!-- characteristics -->
 				<!-- nested vertical slides with Allowing for mandatory variables page 1-->
 				<section id="fragments">
-					<h3 style="text-align: left;" class="fragment">what is<span style="color: cornflowerblue;"> mandatory variables</span>?</h3>
+					<h3 style="text-align: left;" class="fragment">what is<span style="color: cornflowerblue;"> mandatory variables </span>?</h3>
 					
-
-					<h4 style="text-align: left;" class="fragment">Favoring strategy in the<em> AFT model</em></h4>
-						<p style="font-size: 30px; text-align: left;">
-							<span class="fragment">* LASSO regression approach</span>
-						</p>
-					
-					<h4 style="text-align: left;" class="fragment">Favoring strategy in <em> $glmboost$</em></h4>
+					<h4 style="text-align: left;" class="fragment">Favoring strategy in <span style="color: cornflowerblue;">&nbsp;$mboost$</span></h4>
 						<p style="font-size: 30px; text-align: left;">
 							<span class="fragment">* The covariates are divided into the mandatory and the non-mandatory groups </span>
 						</p>
 						<p style="font-size: 30px; text-align: left;">
 							<span class="fragment">* the penalization with $v$ is applied only to the non-mandatory components</span>
 						</p>
+
+					<h4 style="text-align: left;" class="fragment">Favoring strategy in the<span style="color: cornflowerblue;">&nbsp;&nbsp;$AFT-model$</span></h4>
+						<p style="font-size: 30px; text-align: left;">
+							<span class="fragment">* LASSO regression approach</span>
+						</p>
 					
-					<h4 style="text-align: left;" class="fragment">Favoring strategy in <em> $CoxBoost$</em></h4>
+					<h4 style="text-align: left;" class="fragment">Favoring strategy in <span style="color: cornflowerblue;">&nbsp;$CoxBoost$<span style="color: cornflowerblue;"></h4>
 						<p style="font-size: 30px; text-align: left;">
 							<span class="fragment">1. configure the penalty matrix $P$</span>
 						</p>
@@ -528,10 +503,10 @@
 				<section id="fragments">
 					<h4 style="text-align: left;" class="fragment">what is<span style="color: cornflowerblue;"> pathway information</span>?</h4>
 					<p style="font-size: 30px; text-align: left;">
-						<span class="fragment">* <span style="color: red;">correlated</span> microarray features</span>
+						<span class="fragment">* <span class="fragment highlight-red">correlated</span> microarray features</span>
 					</p>
 					<p style="font-size: 30px; text-align: left;">
-						<span class="fragment">* <span style="color: red;">trade-off</span> between model complexity and the representation power</span>
+						<span class="fragment">* <span class="fragment highlight-red">trade-off</span> between model complexity and the representation power</span>
 					</p>
 
 					<h4 style="text-align: left;" class="fragment">Objective: <span style="color: cornflowerblue;">discouraging</span> the selection of <span style="color: cornflowerblue;">single</span> microarray features</h4>
@@ -546,11 +521,118 @@
 				</section>
 			</section>
 
-			<section>
-				<h2>Application with the mlr3 learner</h2>
-				$a^2$
+
+			<section data-auto-animate>
+				<section>
+					<h2>Application with the mlr3 learner</h2>
+				</section>
+				<!-- AFT -->
+				<section>
+					<h2 data-id="code-title">AFT Model</h2>
+					<pre data-id="code-animation"><code class="R" data-trim data-line-numbers="2,4-5,7,10,12,15">
+						## load the mlr3proba library
+						library(mlr3proba)
+						## get required learners for the aft model
+						mlr_learners$get("surv.parametric")
+						lrn_aft <- lrn("surv.parametric")
+						## tunable parameters with the aft model
+						lrn_aft$param_set
+						## parameter set
+						              id    class lower upper                                                      levels        default
+						1:          type ParamFct    NA    NA                                                   aft,ph,po            aft
+						2:     na.action ParamUty    NA    NA                                                               NoDefault[3]
+						3:          dist ParamFct    NA    NA weibull,exponential,gaussian,logistic,lognormal,loglogistic        weibull
+						4:         parms ParamUty    NA    NA                                                               NoDefault[3]
+						5:          init ParamUty    NA    NA                                                               NoDefault[3]
+						6:         scale ParamDbl     0   Inf                                                                          0
+						7:       maxiter ParamInt  -Inf   Inf                                                                         30
+						8: rel.tolerance ParamDbl  -Inf   Inf                                                                      1e-09
+						9:    toler.chol ParamDbl  -Inf   Inf                                                                      1e-10
+					</code></pre>
+				</section>
+
+				<!-- mboost -->
+				<section>
+					<h2 data-id="code-title">mboost</h2>
+					<pre data-id="code-animation"><code class="R" data-trim data-line-numbers="2,5-6,8,11,14,18">
+						## load the mlr3 extralearners library and the mboost library
+						library(mlr3extralearners)
+						library(mboost)
+						## get required learners for the mboost model
+						mlr_learners$get("surv.mboost")
+						lrn_mboost <- lrn("surv.mboost")
+						## tunable parameters with the mboost model
+						lrn_mboost$param_set
+						## parameter set
+						              id    class lower upper                                          levels        default
+						1:   baselearner ParamFct    NA    NA                                  bbs,bols,btree            bbs
+						2:        center ParamLgl    NA    NA                                      TRUE,FALSE           TRUE
+						3: custom.family ParamUty    NA    NA                                                   NoDefault[3]
+						4:        family ParamFct    NA    NA coxph,weibull,loglog,lognormal,gehan,cindex,...          coxph
+						5:          ipcw ParamUty    NA    NA                                                              1
+						6:         mstop ParamInt     0   Inf                                                            100
+						7:     na.action ParamUty    NA    NA                                                    function[1]
+						8:            nu ParamDbl     0     1                                                            0.1        
+					</code></pre>
+				</section>
+				
+				<!-- coxboost -->
+				<section>
+					<h2 data-id="code-title">CoxBoost</h2>
+					<pre data-id="code-animation"><code class="R" data-trim data-line-numbers="2,5-6,8,14">
+						## load the mlr3proba library and the coxboost library
+						library(mlr3extralearners)
+						library(CoxBoost)
+						## get required learners for the coxboost model
+						mlr_learners$get("surv.coxboost")
+						lrn_coxboost <- lrn("surv.coxboost")
+						## tunable parameters with the coxboost model
+						lrn_coxboost$param_set
+						## parameter set
+						                id    class lower upper                      levels        default
+						1:     unpen.index ParamUty    NA    NA                               NoDefault[3]   
+						2:     standardize ParamLgl    NA    NA                  TRUE,FALSE           TRUE      
+						3:          stepno ParamInt     0   Inf                                        100      
+						4:         penalty ParamDbl  -Inf   Inf                               NoDefault[3]    
+						5:       criterion ParamFct    NA    NA pscore,score,hpscore,hscore         pscore      
+						6: stepsize.factor ParamDbl  -Inf   Inf                                          1      
+						7:       sf.scheme ParamFct    NA    NA              sigmoid,linear        sigmoid      
+						8:      pendistmat ParamUty    NA    NA                               NoDefault[3]    
+						9: connected.index ParamUty    NA    NA                               NoDefault[3]    
+					</code></pre>
+				</section>
+				
 			</section>
 
+			<!-- Summary -->
+			<!-- nested vertical slides with Application with mlr3 learner page 1-->
+			<section>
+				<section>
+					<h2 style="text-align: center;">Summary</h2>
+				</section>
+
+				<section>
+							<h3 style="text-align: center;">
+								<span style="color: cornflowerblue;">Background</span>
+							</h3>
+							<h3 style="text-align: center;">
+								The<span style="color: cornflowerblue;"> AFT model | mboost | CoxBoost</span>
+							</h3>
+							<h3 style="text-align: center;">
+								Comparison
+							</h3>
+							<h3 style="text-align: center;">
+								ALLOWING FOR <span style="color: cornflowerblue;">MANDATORY VARIABLES</span>
+							</h3>
+							<h3 style="text-align: center;">
+								INCORPORATING THE <span style="color: cornflowerblue;">PATHWAY INFORMATION</span>
+							</h3>
+							<h3 style="text-align: center;">
+								APPLICATION WITH THE <span style="color: cornflowerblue;">MLR3</span> LEARNER
+							</h3>
+				</section>
+			</section>
+			
 
 			</div>
 
@@ -561,6 +643,7 @@
 		<script src="plugin/notes/notes.js"></script>
 		<script src="plugin/search/search.js"></script>
 		<script src="plugin/markdown/markdown.js"></script>
+		
 		<script src="plugin/highlight/highlight.js"></script>
 		<!-- load the math equation support by math3.js and  -->
 		<script src="plugin/math/math.js"></script>
